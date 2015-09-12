@@ -49,32 +49,6 @@ func SetInt(item map[string]*dynamodb.AttributeValue, key string, val int) {
 	}
 }
 
-// Row is a generic accessor for any dynamodb row. It implements ValueReader,
-// so all of the convenient methods defined there are available.
-type Row struct {
-	StdValueReader
-}
-
-// Rows returns a Row accessor for every row in a table. The order of rows is
-// unspecified. If an error occurs, the rows will be nil. The returned
-// CustomValueReader can be used to define access to custom types across all
-// rows.
-func Rows(db *dynamodb.DynamoDB, tableName string) ([]Row, CustomValueReader) {
-	resp, err := db.Scan(&dynamodb.ScanInput{
-		TableName: aws.String(tableName),
-	})
-	if err != nil {
-		return nil, nil
-	}
-	cr := newCustomReader()
-	rows := make([]Row, len(resp.Items))
-	for i, item := range resp.Items {
-		reader := valueReader{stdValueReader{item}, cr}
-		rows[i] = Row{reader}
-	}
-	return rows, cr
-}
-
 // RowCount returns the number of records in a table.
 func RowCount(db *dynamodb.DynamoDB, tableName string) int {
 	resp, err := db.Scan(&dynamodb.ScanInput{
@@ -85,4 +59,29 @@ func RowCount(db *dynamodb.DynamoDB, tableName string) int {
 		return -1
 	}
 	return int(*resp.Count)
+}
+
+// Row is a generic accessor for any dynamodb row. It implements ValueReader,
+// so all of the convenient methods defined there are available.
+type Row struct {
+	ValueReader
+}
+
+// Rows returns a Row accessor for every row in a table. The order of rows is
+// unspecified. If an error occurs, the rows will be nil. The returned
+// ValueDefiner can be used to define access to custom types across all rows.
+func Rows(db *dynamodb.DynamoDB, tableName string) ([]Row, ValueDefiner) {
+	resp, err := db.Scan(&dynamodb.ScanInput{
+		TableName: aws.String(tableName),
+	})
+	if err != nil {
+		return nil, nil
+	}
+	vd := newValueDefiner()
+	rows := make([]Row, len(resp.Items))
+	for i, item := range resp.Items {
+		reader := valueReader{item, vd}
+		rows[i] = Row{reader}
+	}
+	return rows, vd
 }

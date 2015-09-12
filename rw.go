@@ -6,62 +6,61 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
-// ValueReader is the interface for anything that can read values from a
-// dynamodb row.
+// ValueReader defines access to different types of value.
 type ValueReader interface {
-	StdValueReader
-	CustomValueReader
-}
-
-// StdValueReader defines access for builtin types.
-type StdValueReader interface {
 	Str(key string) string
 	Int(key string) int
-}
-
-// CustomValueReader lets you define and get custom types.
-type CustomValueReader interface {
-	Def(key string, f func() interface{})
 	Get(key string) interface{}
+	ValueDefiner
 }
 
-type customValueReader struct {
-	gen map[string]func() interface{}
+// ValueDefiner lets you define accessors for custom types.
+type ValueDefiner interface {
+	Def(key string, f DefFunc)
 }
 
-func newCustomReader() customValueReader {
-	return customValueReader{make(map[string]func() interface{})}
+// DefFunc is the handler for custom types.
+type DefFunc func(ValueReader) interface{}
+
+type valueDefiner struct {
+	defs map[string]DefFunc
 }
 
-func (r customValueReader) Def(key string, f func() interface{}) {
-	r.gen[key] = f
+func newValueDefiner() valueDefiner {
+	return valueDefiner{make(map[string]DefFunc)}
 }
-func (r customValueReader) Get(key string) interface{} {
-	if f, ok := r.gen[key]; ok {
-		return f()
+
+func (r valueDefiner) Def(key string, f DefFunc) {
+	r.defs[key] = f
+}
+func (r valueDefiner) call(key string, vr ValueReader) interface{} {
+	if f, ok := r.defs[key]; ok {
+		return f(vr)
 	}
-	return fmt.Errorf("Missing def for: %s", key)
-}
-
-type stdValueReader struct {
-	item map[string]*dynamodb.AttributeValue
-}
-
-func (r stdValueReader) Str(key string) string {
-	return Str(r.item, key)
-}
-func (r stdValueReader) Int(key string) int {
-	return Int(r.item, key)
+	panic(fmt.Sprintf("Missing def for: %s", key))
 }
 
 type valueReader struct {
-	stdValueReader
-	customValueReader
+	item map[string]*dynamodb.AttributeValue
+	def  valueDefiner
+}
+
+func (r valueReader) Str(key string) string {
+	return Str(r.item, key)
+}
+func (r valueReader) Int(key string) int {
+	return Int(r.item, key)
+}
+func (r valueReader) Def(key string, f DefFunc) {
+	r.def.Def(key, f)
+}
+func (r valueReader) Get(key string) interface{} {
+	return r.def.call(key, r)
 }
 
 // NewValueReader initializes a ValueReader over an item.
 func NewValueReader(item map[string]*dynamodb.AttributeValue) ValueReader {
-	return valueReader{stdValueReader{item}, customValueReader{}}
+	return valueReader{item, newValueDefiner()}
 }
 
 // ValueWriter lets you easily set values in an DynamoDB AttributeValue map.

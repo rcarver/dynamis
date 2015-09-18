@@ -14,6 +14,9 @@ func Str(item map[string]*dynamodb.AttributeValue, key string) string {
 		return ""
 	}
 	if val, ok := item[key]; ok {
+		if val.S == nil {
+			return ""
+		}
 		return *val.S
 	}
 	return ""
@@ -26,6 +29,9 @@ func Int(item map[string]*dynamodb.AttributeValue, key string) int {
 		return 0
 	}
 	if val, ok := item[key]; ok {
+		if val.N == nil {
+			return 0
+		}
 		if i, err := strconv.Atoi(*val.N); err == nil {
 			return i
 		}

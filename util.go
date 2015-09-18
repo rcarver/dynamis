@@ -41,7 +41,7 @@ func Int(item map[string]*dynamodb.AttributeValue, key string) int {
 
 // SetStr stores a string attribute. If the string is empty, it is not stored.
 func SetStr(item map[string]*dynamodb.AttributeValue, key string, val string) {
-	if val != "" {
+	if key != "" && val != "" {
 		item[key] = &dynamodb.AttributeValue{
 			S: aws.String(val),
 		}
@@ -50,8 +50,10 @@ func SetStr(item map[string]*dynamodb.AttributeValue, key string, val string) {
 
 // SetInt stores an int attribute.
 func SetInt(item map[string]*dynamodb.AttributeValue, key string, val int) {
-	item[key] = &dynamodb.AttributeValue{
-		N: aws.String(strconv.FormatInt(int64(val), 10)),
+	if key != "" {
+		item[key] = &dynamodb.AttributeValue{
+			N: aws.String(strconv.FormatInt(int64(val), 10)),
+		}
 	}
 }
 

@@ -1,6 +1,7 @@
 package dynamo
 
 import (
+	"reflect"
 	"testing"
 	"time"
 
@@ -73,5 +74,44 @@ func TestValueReader(t *testing.T) {
 	}()
 	if didPanic != "Missing def for: nope" {
 		t.Errorf("Expected Get() to panic, got %s", didPanic)
+	}
+}
+
+func TestValueWriter(t *testing.T) {
+	tests := []struct {
+		strK string
+		strV string
+		intK string
+		intV int
+		want map[string]*dynamodb.AttributeValue
+	}{
+		{
+			strK: "s",
+			strV: "",
+			intK: "i",
+			intV: 0,
+			want: map[string]*dynamodb.AttributeValue{
+				"i": {N: aws.String("0")},
+			},
+		},
+		{
+			strK: "s",
+			strV: "hello",
+			intK: "i",
+			intV: 33,
+			want: map[string]*dynamodb.AttributeValue{
+				"s": {S: aws.String("hello")},
+				"i": {N: aws.String("33")},
+			},
+		},
+	}
+	for i, test := range tests {
+		item := make(map[string]*dynamodb.AttributeValue)
+		w := NewValueWriter(item)
+		w.Str(test.strK, test.strV)
+		w.Int(test.intK, test.intV)
+		if !reflect.DeepEqual(item, test.want) {
+			t.Errorf("%d ValueWriter got %#v, want %#v", i, item, test.want)
+		}
 	}
 }

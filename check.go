@@ -49,8 +49,8 @@ type Table struct {
 }
 
 // CheckTable initializes a new wrapper over the table.
-func CheckTable(cfg *aws.Config, tableName string) Table {
-	return Table{dynamodb.New(cfg), tableName}
+func CheckTable(db *dynamodb.DynamoDB, tableName string) Table {
+	return Table{db, tableName}
 }
 
 // RowCount returns the number of rows in the table.

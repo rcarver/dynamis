@@ -257,3 +257,54 @@ func TestCheckRows(t *testing.T) {
 		}
 	}
 }
+
+func TestCheckTable(t *testing.T) {
+	tbl := newTable()
+	init := func() error {
+		_, err := tbl.db.CreateTable(&dynamodb.CreateTableInput{
+			TableName: aws.String(tbl.name),
+			AttributeDefinitions: []*dynamodb.AttributeDefinition{
+				{
+					AttributeName: aws.String("str"),
+					AttributeType: aws.String("S"),
+				},
+			},
+			KeySchema: []*dynamodb.KeySchemaElement{
+				{
+					AttributeName: aws.String("str"),
+					KeyType:       aws.String("HASH"),
+				},
+			},
+			ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+				ReadCapacityUnits:  aws.Int64(1),
+				WriteCapacityUnits: aws.Int64(1),
+			},
+		})
+		if err != nil {
+			return err
+		}
+		_, err = tbl.db.PutItem(&dynamodb.PutItemInput{
+			TableName: aws.String(tbl.name),
+			Item: map[string]*dynamodb.AttributeValue{
+				"str": {
+					S: aws.String("hello"),
+				},
+			},
+		})
+		return err
+	}
+	if err := init(); err != nil {
+		t.Fatalf("Failed initializing: %s", err)
+	}
+	table := CheckTable(tbl.db, tbl.name)
+	if got, want := table.RowCount(), 1; got != want {
+		t.Errorf("RowCount got %d, want %d", got, want)
+	}
+	rows, vd := table.Rows()
+	if got, want := len(rows), 1; got != want {
+		t.Errorf("Rows len got %d, want %d", got, want)
+	}
+	if vd == nil {
+		t.Errorf("ValueDefiner is nil")
+	}
+}

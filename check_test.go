@@ -87,7 +87,7 @@ func TestCheckRowCount(t *testing.T) {
 	for i, test := range tests {
 		tbl := newTable()
 		if err := test.init(tbl); err != nil {
-			t.Error("%d failed init: %s", err)
+			t.Errorf("%d failed init: %s", err)
 			continue
 		}
 		got := CheckRowCount(tbl.db, tbl.name)
@@ -228,7 +228,7 @@ func TestCheckRows(t *testing.T) {
 	for i, test := range tests {
 		tbl := newTable()
 		if err := test.init(tbl); err != nil {
-			t.Error("%d failed init: %s", err)
+			t.Errorf("%d failed init: %s", err)
 			continue
 		}
 		rows, vd := CheckRows(tbl.db, tbl.name)

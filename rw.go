@@ -8,14 +8,23 @@ import (
 
 // ValueReader defines access to different types of value.
 type ValueReader interface {
+
+	// Str returns a string value from the item.
 	Str(key string) string
+
+	// Int returns an int value from the item.
 	Int(key string) int
+
+	// Get returns the value from a custom-defined field.
 	Get(key string) interface{}
+
+	// ValueDefiner provides Def()
 	ValueDefiner
 }
 
 // ValueDefiner lets you define accessors for custom types.
 type ValueDefiner interface {
+	// Def defines a custom conversion, accessible via Get.
 	Def(key string, f DefFunc)
 }
 
@@ -45,22 +54,15 @@ type valueReader struct {
 	def  valueDefiner
 }
 
-// Str returns a string value from the item.
 func (r valueReader) Str(key string) string {
 	return Str(r.item, key)
 }
-
-// Int returns an int value from the item.
 func (r valueReader) Int(key string) int {
 	return Int(r.item, key)
 }
-
-// Def defines a custom conversion, accessible via Get.
 func (r valueReader) Def(key string, f DefFunc) {
 	r.def.Def(key, f)
 }
-
-// Get returns the value from a custom-defined field.
 func (r valueReader) Get(key string) interface{} {
 	return r.def.call(key, r)
 }

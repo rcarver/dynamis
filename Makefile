@@ -46,7 +46,8 @@ stop-%:
 dynamodb-port=8000
 tmp/docker/dynamodb:
 	mkdir -p $(dir $@)
-	docker run --cidfile=$@ --name dynamodb -d -p 8000:${dynamodb-port} dynamodb
+	docker build --rm -t dynamis-dynamodb .
+	docker run --cidfile=$@ --name dynamodb -d -p 8000:${dynamodb-port} dynamis-dynamodb
 
 
 

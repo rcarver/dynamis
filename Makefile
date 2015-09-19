@@ -47,6 +47,8 @@ dynamodb-port=8000
 tmp/docker/dynamodb:
 	mkdir -p $(dir $@)
 	docker build --rm -t dynamis-dynamodb .
+	test -n "$${TRAVIS}" && sudo service docker restart && sleep 10 || true
+	docker build --rm -t dynamis-dynamodb .
 	docker run --cidfile=$@ --name dynamodb -d -p 8000:${dynamodb-port} dynamis-dynamodb
 
 

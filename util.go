@@ -22,7 +22,7 @@ func Str(item map[string]*dynamodb.AttributeValue, key string) string {
 	return ""
 }
 
-// Str returns an int from a DynamoDB attribute value. If anything goes wrong
+// Int returns an int from a DynamoDB attribute value. If anything goes wrong
 // reading or parsing the value, 0 is returned.
 func Int(item map[string]*dynamodb.AttributeValue, key string) int {
 	if item == nil {

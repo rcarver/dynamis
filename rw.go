@@ -45,15 +45,22 @@ type valueReader struct {
 	def  valueDefiner
 }
 
+// Str returns a string value from the item.
 func (r valueReader) Str(key string) string {
 	return Str(r.item, key)
 }
+
+// Int returns an int value from the item.
 func (r valueReader) Int(key string) int {
 	return Int(r.item, key)
 }
+
+// Def defines a custom conversion, accessible via Get.
 func (r valueReader) Def(key string, f DefFunc) {
 	r.def.Def(key, f)
 }
+
+// Get returns the value from a custom-defined field.
 func (r valueReader) Get(key string) interface{} {
 	return r.def.call(key, r)
 }
@@ -73,9 +80,12 @@ func NewValueWriter(item map[string]*dynamodb.AttributeValue) ValueWriter {
 	return ValueWriter{item}
 }
 
+// Str writes a string value to the item.
 func (w ValueWriter) Str(key string, val string) {
 	SetStr(w.item, key, val)
 }
+
+// Int writes an int values to the item.
 func (w ValueWriter) Int(key string, val int) {
 	SetInt(w.item, key, val)
 }

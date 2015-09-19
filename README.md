@@ -1,5 +1,7 @@
 # Dynamis
 
+[![Build Status](https://travis-ci.org/rcarver/dynamis.svg?branch=master)](https://travis-ci.org/rcarver/dynamis)
+
 Dynamis is a lightweight tool for working with
 [DynamoDB](https://aws.amazon.com/dynamodb/) via the
 [aws-sdk](https://github.com/aws/aws-sdk-go). Its goal is to reduce some of the

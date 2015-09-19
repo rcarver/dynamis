@@ -54,11 +54,8 @@ r := dynamis.NewValueReader(resp.Item)
 
 // Define a custom reader for start_date to turn it back into a time.
 r.Def("start_date", func(vr dynamis.ValueReader) interface{} {
-  startDate, err := time.Parse(time.RFC822, vr.Str("start_date"))
-  if err != nil {
-    return Date{}
-  }
-  return startDate
+  time, _ := time.Parse(time.RFC822, vr.Str("start_date"))
+  return time // will be time.Time's zero value if error.
 })
 
 // Now read from the item. ValueReader handles missing keys, missing values, 

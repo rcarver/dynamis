@@ -1,4 +1,4 @@
-package dynamo
+package dynamis
 
 import (
 	"reflect"

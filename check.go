@@ -1,4 +1,4 @@
-package dynamo
+package dynamis
 
 import (
 	"github.com/aws/aws-sdk-go/aws"

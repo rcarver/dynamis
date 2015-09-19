@@ -19,7 +19,7 @@ how dynamis saves you some headaches.
 item := map[string]*dynamodb.AttributeValue{}
 
 // Initialize a dyanmis.ValueWriter for convenience.
-w := dynamo.NewValueWriter(item)
+w := dynamis.NewValueWriter(item)
 w.Str("user_id", u.UserID.String())
 
 // Name could be empty, which DynamoDB doesn't allow. Dynamis
@@ -50,7 +50,7 @@ resp, err := db.GetItem(&dynamodb.GetItemInput{
 })
 
 // Initialize a ValueReader of the response item.
-r := dynamo.NewValueReader(resp.Item)
+r := dynamis.NewValueReader(resp.Item)
 
 // Define a custom reader for start_date to turn it back into a time.
 r.Def("start_date", func(vr dynamis.ValueReader) interface{} {

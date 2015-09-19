@@ -21,6 +21,7 @@ func TestValueReader(t *testing.T) {
 		defV interface{}
 	}{
 		{
+			// Zero values.
 			item: map[string]*dynamodb.AttributeValue{},
 			strK: "s",
 			strV: "",
@@ -31,6 +32,7 @@ func TestValueReader(t *testing.T) {
 			defV: "ok",
 		},
 		{
+			// Good values.
 			item: map[string]*dynamodb.AttributeValue{
 				"s": {S: aws.String("hello")},
 				"i": {N: aws.String("33")},
@@ -86,6 +88,7 @@ func TestValueWriter(t *testing.T) {
 		want map[string]*dynamodb.AttributeValue
 	}{
 		{
+			// Zero values.
 			strK: "s",
 			strV: "",
 			intK: "i",
@@ -95,6 +98,7 @@ func TestValueWriter(t *testing.T) {
 			},
 		},
 		{
+			// Good values.
 			strK: "s",
 			strV: "hello",
 			intK: "i",

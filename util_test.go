@@ -15,21 +15,25 @@ func TestStr(t *testing.T) {
 		want string
 	}{
 		{
+			// Item is nil, returns the zero value.
 			item: nil,
 			key:  "k",
 			want: "",
 		},
 		{
+			// Key does not exist, returns the zero value.
 			item: map[string]*dynamodb.AttributeValue{},
 			key:  "k",
 			want: "",
 		},
 		{
+			// Key exists, but not a value. Returns the zero value.
 			item: map[string]*dynamodb.AttributeValue{"k": {}},
 			key:  "k",
 			want: "",
 		},
 		{
+			// Key and value exist, returns the value.
 			item: map[string]*dynamodb.AttributeValue{"k": {S: aws.String("v")}},
 			key:  "k",
 			want: "v",
@@ -50,34 +54,40 @@ func TestInt(t *testing.T) {
 		want int
 	}{
 		{
+			// Item is nil, returns the zero value.
 			item: nil,
 			key:  "k",
 			want: 0,
 		},
 		{
+			// Key does not exist, returns the zero value.
 			item: map[string]*dynamodb.AttributeValue{},
 			key:  "k",
 			want: 0,
 		},
 		{
+			// Key exists with no value, returns the zero value.
 			item: map[string]*dynamodb.AttributeValue{"k": {}},
 			key:  "k",
 			want: 0,
 		},
 		{
-			item: map[string]*dynamodb.AttributeValue{"k": {N: aws.String("0")}},
-			key:  "k",
-			want: 0,
-		},
-		{
+			// Key exists, fails to parse. Returns the zero value.
 			item: map[string]*dynamodb.AttributeValue{"k": {N: aws.String("NaN")}},
 			key:  "k",
 			want: 0,
 		},
 		{
+			// Key exists, is number.
 			item: map[string]*dynamodb.AttributeValue{"k": {N: aws.String("33")}},
 			key:  "k",
 			want: 33,
+		},
+		{
+			// Key exists, is negative number.
+			item: map[string]*dynamodb.AttributeValue{"k": {N: aws.String("-1")}},
+			key:  "k",
+			want: -1,
 		},
 	}
 	for i, test := range tests {

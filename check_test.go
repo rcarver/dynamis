@@ -15,12 +15,14 @@ func TestCheckRowCount(t *testing.T) {
 		want int
 	}{
 		{
+			// Non-existent table returns -1.
 			init: func(table) error {
 				return nil
 			},
 			want: -1,
 		},
 		{
+			// Table with no records returns 0.
 			init: func(t table) error {
 				_, err := t.db.CreateTable(&dynamodb.CreateTableInput{
 					TableName: aws.String(t.name),
@@ -46,6 +48,7 @@ func TestCheckRowCount(t *testing.T) {
 			want: 0,
 		},
 		{
+			// Table with records returns the number of records.
 			init: func(t table) error {
 				var err error
 				_, err = t.db.CreateTable(&dynamodb.CreateTableInput{
@@ -107,6 +110,7 @@ func TestCheckRows(t *testing.T) {
 		val  interface{}
 	}{
 		{
+			// Non-existent table returns nil stuff.
 			init: func(table) error {
 				return nil
 			},
@@ -114,6 +118,7 @@ func TestCheckRows(t *testing.T) {
 			err: true,
 		},
 		{
+			// Table with no records.
 			init: func(t table) error {
 				_, err := t.db.CreateTable(&dynamodb.CreateTableInput{
 					TableName: aws.String(t.name),
@@ -139,6 +144,7 @@ func TestCheckRows(t *testing.T) {
 			len: 0,
 		},
 		{
+			// Table with records.
 			init: func(t table) error {
 				var err error
 				_, err = t.db.CreateTable(&dynamodb.CreateTableInput{
@@ -179,6 +185,7 @@ func TestCheckRows(t *testing.T) {
 			val: "one",
 		},
 		{
+			// Table with records and parse a custom value.
 			init: func(t table) error {
 				var err error
 				_, err = t.db.CreateTable(&dynamodb.CreateTableInput{
